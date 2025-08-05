@@ -15,11 +15,16 @@ Help with basics of NextJS, such as:
 ## Configuration
 
 Command `Edit Config` - creates a config file in the root of the project, also you can modify:
-    - "pagePath" - Path for new pages (default: src/app)
-    - "actionPath" - Path for new actions (default: src/actions)
-    - "componentPath" - Path for new components (default: src/components)
-    - "style" - Style for new components (default: tailwind) (@NOTE: FOR NOW DOES NOTHING)
-    - "packageManager" - Package manager (default: pnpm, options: bun, deno, npm, pnpm)
+    
+- "pagePath" - Path for new pages (default: src/app)
+
+- "actionPath" - Path for new actions (default: src/actions)
+
+- "componentPath" - Path for new components (default: src/components)
+
+- "style" - Style for new components (default: tailwind) (@NOTE: FOR NOW DOES NOTHING)
+
+- "packageManager" - Package manager (default: pnpm, options: bun, deno, npm, pnpm)
 
 
 ## Instalation
