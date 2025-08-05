@@ -1,0 +1,7 @@
+{
+  "componentPath": "src/components/{{type}}",
+  "pagePath": "src/app/{{route}}",
+  "actionPath": "src/actions",
+  "style": "css-module",
+  "packageManager": "pnpm"
+}
