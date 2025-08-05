@@ -1,6 +1,6 @@
 {
   "name": "nextcli-helper",
-  "description": "Minimal TUI code generator for Next.js projects",
+  "description": "Simple CLI NextJS helper!",
   "version": "2.0.0",
   "bin": {
     "nextcli": "./cli.js"
