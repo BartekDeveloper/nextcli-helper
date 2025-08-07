@@ -1,7 +1,17 @@
-import fs, { copyFile, mkdir } from 'fs/promises';
+import fs, {
+    copyFile as fsCopyFile,
+    mkdir,
+    writeFile as fsWriteFile,
+} from 'fs/promises';
+
+import {
+    copyFileSync,
+    renameSync as fsRenameSync
+} from "fs";
+
 import path from 'path';
 import { exec, spawn } from "child_process"
-import { cpSync, mkdirSync } from 'fs';
+import { cpSync, existsSync, mkdirSync, readFile, readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 
 export async function createFromTemplate(templateName, outFile, vars = {}) {
@@ -90,4 +100,102 @@ export function recopyTemplates() {
     } catch (error) {
         console.error(`Error copying templates: ${error.message}`);
     }
+}
+
+export function addBetterAuth_ClientAndSever() {
+    createFromTemplate("auth", "auth.ts");
+    createFromTemplate("auth-client", "auth-client.ts");
+}
+
+export function move(src, dst) {
+    try {
+        // Ensure dst is a directory path (ends with a slash)
+        if (!dst.endsWith('/')) {
+            dst += '/';
+        }
+        
+        // Create destination directory if it doesn't exist
+        const dir = dst;
+        if (dir !== './') {
+            mkdirSync(dir, { recursive: true });
+        }
+        
+        // Get the filename from the source path
+        const filename = path.basename(src);
+        
+        // Construct the final destination path
+        const finalDst = path.join(dir, filename);
+        
+        fsRenameSync(src, finalDst);
+        console.log(`✅ Moved: ${src} to ${finalDst}`);
+    } catch (err) {
+        console.error(err);
+    }
+} 
+
+export async function writeFile(dst, data) {
+    try {
+        // If data is an object, stringify it first
+        if (typeof data === 'object' && data !== null) {
+            data = JSON.stringify(data, null, 2);
+        }
+        
+        // Create parent directories if they don't exist
+        const dir = path.dirname(dst);
+        if (dir !== '.') {
+            await fs.mkdir(dir, { recursive: true });
+        }
+        
+        await fsWriteFile(dst, data);
+        console.log(`✅ Created: ${dst}`);
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+export function copyFile(src, dst) {
+    try {
+        copyFileSync(src, dst);
+        console.log(`✅ Copied: ${src} to ${dst}`);
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+let cachedConfig = null;
+let originalConfigPath = null;
+
+export function cacheConfigFile() {
+    if (!cachedConfig) {
+        try {
+            originalConfigPath = process.cwd();
+            cachedConfig = readFileSync("./nextcli.config.json").toString();
+        } catch (e) {
+            // File may not exist, return default config
+            cachedConfig = JSON.stringify({
+                componentPath: "src/components/{{type}}",
+                pagePath: "src/app/{{route}}",
+                actionPath: "src/actions",
+                style: "css-module",
+                packageManager: "pnpm"
+            }, null, 2);
+        }
+    }
+    return cachedConfig;
+}
+
+export function restoreConfigFile() {
+    if (cachedConfig && originalConfigPath) {
+        try {
+            process.chdir(originalConfigPath);
+            fs.writeFileSync("./nextcli.config.json", cachedConfig);
+            console.log("✅ Restored original nextcli.config.json");
+        } catch (e) {
+            console.error("❌ Error restoring original config:", e);
+        }
+    }
+}
+
+export function exists(file) {
+    return existsSync(file)
 }

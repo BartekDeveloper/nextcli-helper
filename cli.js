@@ -1,6 +1,15 @@
 #!/usr/bin/env node
 import inquirer from 'inquirer';
-import { createFromTemplate, removeFile, loadToolConfig, saveToolConfig, runCommand, recopyTemplates } from './utils.js';
+import {
+    createFromTemplate, removeFile,
+    loadToolConfig, saveToolConfig,
+    runCommand, recopyTemplates,
+    move, cacheConfigFile, restoreConfigFile,
+    writeFile, copyFile,
+    exists
+} from './utils.js';
+
+var currentDir = ".";
 
 const main = async () => {
     const config = await loadToolConfig();
@@ -14,6 +23,7 @@ const main = async () => {
             'Run Nextjs',
             'Add Page',
             'Add Component',
+            'Add Better-Auth',
             'Add Server Action',
             'Edit Config',
             'Make Templates Local',
@@ -30,6 +40,18 @@ const main = async () => {
                 default: "."
             }
         ]);
+        
+
+
+        let content = "";
+        if(path == "." || path == "./.") {
+            if(exists("./nextcli.config.json")) {
+                content = cacheConfigFile();
+                console.log(content);
+                removeFile("./nextcli.config.json")
+            }
+        }
+
         const { packageManager } = await loadToolConfig();
         
         if(process.stdin.isTTY) {
@@ -39,6 +61,17 @@ const main = async () => {
             await runCommand(packageManager, ['create', 'next-app@latest', path]);
         } catch (error) {
             console.error('An error occurred:', error);
+        }
+
+        console.log("Current Dir:\t", currentDir);
+        let toWrite = (content != "") ? content : await loadToolConfig();
+        await writeFile(currentDir + "/nextcli.config.json", toWrite);
+        
+        if(path != ".") {
+            move("nextcli.config.json", path);
+            // Change to the newly created directory
+            process.chdir(path);
+            console.log(`✅ Changed directory to: ${path}`);
         }
 
     } else if (action === 'Run Nextjs') {
@@ -73,7 +106,10 @@ const main = async () => {
         const dir = config.pagePath.replace('{{route}}', routeName);
         const outPath = `${dir}/page.tsx`;
         await createFromTemplate('page', outPath, { route });
-        
+    
+    } else if (action === "Add Better-Auth") {
+        addBetterAuth_ClientAndSever()
+
     } else if (action === 'Add Server Action') {
         const { name } = await inquirer.prompt([
             { type: 'input', name: 'name', message: 'Action name:' }

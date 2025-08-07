@@ -31,7 +31,7 @@ Command `Edit Config` - creates a config file in the root of the project, also y
 
 ```bash
 # Bun
-bun install nextcli-helper
+bun install -g nextcli-helper
 
 # Npm
 npm install -g nextcli-helper
@@ -61,7 +61,10 @@ nextcli
 
 MIT
 
+# REPO
+- [BartekDeveloper/nextcli-helper](https://github.com/BartekDeveloper/nextcli-helper)
 
 # NPM
 
 - [nextcli-helper](https://www.npmjs.com/package/nextcli-helper?activeTab=readme)
+
