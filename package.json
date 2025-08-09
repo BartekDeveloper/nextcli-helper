@@ -1,7 +1,7 @@
 {
   "name": "nextcli-helper",
   "description": "Simple CLI NextJS helper!",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "bin": {
     "nextcli": "./cli.js"
   },
