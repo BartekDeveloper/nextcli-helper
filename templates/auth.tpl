@@ -1,5 +1,6 @@
 import {
-    betterAuth
+    betterAuth,
+    passkey
 } from 'better-auth';
 
 export const auth = betterAuth({

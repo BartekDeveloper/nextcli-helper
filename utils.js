@@ -11,7 +11,7 @@ import {
 
 import path from 'path';
 import { exec, spawn } from "child_process"
-import { cpSync, existsSync, mkdirSync, readFile, readFileSync } from 'fs';
+import { cpSync, existsSync, mkdirSync, readFile, readFileSync, readdirSync, statSync } from 'fs';
 import { fileURLToPath } from 'url';
 
 export async function createFromTemplate(templateName, outFile, vars = {}) {
@@ -102,9 +102,11 @@ export function recopyTemplates() {
     }
 }
 
-export function addBetterAuth_ClientAndSever() {
-    createFromTemplate("auth", "auth.ts");
-    createFromTemplate("auth-client", "auth-client.ts");
+export async function addBetterAuth_ClientAndSever() {
+    await createFromTemplate("auth", "src/auth.ts");
+    await createFromTemplate("auth-client", "src/auth-client.ts");
+    await createFromTemplate("components/client/sign-up", "src/components/client/sign-up.tsx")
+    await createFromTemplate("components/client/sign-in", "src/components/client/sign-in.tsx")
 }
 
 export function move(src, dst) {
@@ -198,4 +200,32 @@ export function restoreConfigFile() {
 
 export function exists(file) {
     return existsSync(file)
+}
+
+export function copyDir(src, dst) {
+    try {
+        // Make sure destination directory exists
+        mkdirSync(dst, { recursive: true });
+        
+        // Get all files and directories in source
+        const items = existsSync(src) ? readdirSync(src) : [];
+        
+        // Copy each item
+        for (const item of items) {
+            const srcPath = path.join(src, item);
+            const dstPath = path.join(dst, item);
+            
+            if (statSync(srcPath).isDirectory()) {
+                // Recursively copy subdirectories
+                copyDir(srcPath, dstPath);
+            } else {
+                // Copy files
+                copyFileSync(srcPath, dstPath);
+            }
+        }
+        
+        console.log(`✅ Copied directory: ${src} to ${dst}`);
+    } catch (err) {
+        console.error(err);
+    }
 }
